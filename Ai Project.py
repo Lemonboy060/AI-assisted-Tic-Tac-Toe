@@ -12,21 +12,19 @@ class TicTacToeGame:
         self.buttons = [[None for _ in range(3)] for _ in range(3)]
         
         # Game Interface
-        self.create_header()
         self.create_board_frame()
         self.create_board_buttons()
         self.create_control_buttons()
     
-    def create_header(self):
-        # Header to show the current player's turn
-        self.header = tk.Label(self.root, text="Player X's Turn", font=('Arial', 16, 'bold'), fg="white")
-        self.header.grid(row=0, column=0, pady=10)
-
     def create_board_frame(self):
         # Frame for the grid with background color
         self.board_frame = tk.Frame(self.root, bg="lightblue", padx=10, pady=10)
-        self.board_frame.grid(row=1, column=0, padx=10, pady=10)
-    
+        self.board_frame.grid(row=0, column=0, padx=10, pady=10)
+        
+        # Header to show the current player's turn (inside board frame)
+        self.header = tk.Label(self.board_frame, text="Player X's Turn", font=('Arial', 16, 'bold'), fg="black", bg="lightblue")
+        self.header.grid(row=0, column=0, columnspan=3, pady=10)
+
     def create_board_buttons(self):
         # Create a 3x3 grid of buttons within the board frame
         for row in range(3):
@@ -36,13 +34,13 @@ class TicTacToeGame:
                     bg="lightblue",
                     command=lambda r=row, c=col: self.make_move(r, c)
                 )
-                button.grid(row=row, column=col, padx=5, pady=5)
+                button.grid(row=row+1, column=col, padx=5, pady=5)
                 self.buttons[row][col] = button
 
     def create_control_buttons(self):
-        # Frame for the control buttons
+        # Frame for the control buttons below the board frame
         control_frame = tk.Frame(self.root)
-        control_frame.grid(row=2, column=0, pady=10)
+        control_frame.grid(row=1, column=0, pady=10)
         
         # Reset button
         reset_button = tk.Button(control_frame, text="Reset Game", font=('Arial', 14), command=self.reset_board)
@@ -70,7 +68,7 @@ class TicTacToeGame:
             else:
                 # Switch player and update the header text
                 self.current_player = "O" if self.current_player == "X" else "X"
-                self.header.config(text=f"Player {self.current_player}'s Turn", fg="white")
+                self.header.config(text=f"Player {self.current_player}'s Turn", fg="black")
     
     def check_winner(self, row, col):
         # Check if the current player has won
@@ -106,3 +104,9 @@ class TicTacToeGame:
 root = tk.Tk()
 game = TicTacToeGame(root)
 root.mainloop()
+
+
+
+
+
+
