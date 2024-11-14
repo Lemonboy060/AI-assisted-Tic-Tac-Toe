@@ -1,0 +1,114 @@
+import tkinter as tk
+
+class TicTacToeGame:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Tic-Tac-Toe")
+
+        # Main Frame for all elements with unified light blue color
+        self.main_frame = tk.Frame(self.root, bg="lightblue", bd=3, relief="ridge", padx=10, pady=10)
+        self.main_frame.grid(row=0, column=0, padx=20, pady=20)
+
+        # Game State
+        self.current_player = "X"
+        self.board = [["" for _ in range(3)] for _ in range(3)]
+        self.buttons = [[None for _ in range(3)] for _ in range(3)]
+
+        # Game Interface
+        self.create_header()
+        self.create_board_frame()
+        self.create_board_buttons()
+        self.create_control_buttons()
+
+    def create_header(self):
+        # Header to show the current player's turn or win message
+        self.header = tk.Label(self.main_frame, text="Player X's Turn", font=('Arial', 16, 'bold'), fg="black", bg="lightblue")
+        self.header.grid(row=0, column=0, pady=(0, 10))
+
+    def create_board_frame(self):
+        # Frame for the grid with a background color matching the main frame
+        self.board_frame = tk.Frame(self.main_frame, bg="lightblue", padx=5, pady=5)
+        self.board_frame.grid(row=1, column=0)
+
+    def create_board_buttons(self):
+        # Create a 3x3 grid of buttons within the board frame
+        for row in range(3):
+            for col in range(3):
+                button = tk.Button(
+                    self.board_frame, text="", font=('Arial', 24), width=5, height=2,
+                    bg="lightblue", borderwidth=1, relief="solid",
+                    command=lambda r=row, c=col: self.make_move(r, c)
+                )
+                button.grid(row=row, column=col, sticky="nsew")
+                self.buttons[row][col] = button
+
+        # Make each row and column stretchable in the grid
+        for i in range(3):
+            self.board_frame.grid_rowconfigure(i, weight=1)
+            self.board_frame.grid_columnconfigure(i, weight=1)
+
+    def create_control_buttons(self):
+        # Frame for the control buttons within the main frame
+        control_frame = tk.Frame(self.main_frame, bg="lightblue")
+        control_frame.grid(row=2, column=0, pady=(10, 0))
+
+        # Reset button
+        reset_button = tk.Button(control_frame, text="Reset Game", font=('Arial', 14), command=self.reset_board, bg="white")
+        reset_button.pack(side=tk.LEFT, padx=20)
+
+        # Quit button
+        quit_button = tk.Button(control_frame, text="Quit", font=('Arial', 14), command=self.root.quit, bg="white")
+        quit_button.pack(side=tk.LEFT, padx=20)
+
+    def make_move(self, row, col):
+        # Make a move if the cell is empty
+        if self.board[row][col] == "" and "wins!" not in self.header.cget("text"):
+            self.board[row][col] = self.current_player
+            self.buttons[row][col].config(
+                text=self.current_player,
+                fg="black",
+                bg="teal" if self.current_player == "X" else "orange"
+            )
+            if self.check_winner(row, col):
+                self.header.config(text=f"Player {self.current_player} wins!")
+            elif self.check_draw():
+                self.header.config(text="It's a draw!")
+            else:
+                # Switch player and update the header text
+                self.current_player = "O" if self.current_player == "X" else "X"
+                self.header.config(text=f"Player {self.current_player}'s Turn", fg="black")
+
+    def check_winner(self, row, col):
+        # Check if the current player has won
+        # Check the row
+        if all(self.board[row][c] == self.current_player for c in range(3)):
+            return True
+        # Check the column
+        if all(self.board[r][col] == self.current_player for r in range(3)):
+            return True
+        # Check the main diagonal
+        if row == col and all(self.board[i][i] == self.current_player for i in range(3)):
+            return True
+        # Check the secondary diagonal
+        if row + col == 2 and all(self.board[i][2 - i] == self.current_player for i in range(3)):
+            return True
+        return False
+
+    def check_draw(self):
+        # Check if the game is a draw (all cells are filled and no winner)
+        return all(self.board[row][col] != "" for row in range(3) for col in range(3))
+
+    def reset_board(self):
+        # Reset the board and the GUI buttons
+        self.current_player = "X"
+        self.board = [["" for _ in range(3)] for _ in range(3)]
+        for row in range(3):
+            for col in range(3):
+                self.buttons[row][col].config(text="", bg="lightblue")
+        # Update header
+        self.header.config(text="Player X's Turn", fg="black")
+
+# Initialize the game
+root = tk.Tk()
+game = TicTacToeGame(root)
+root.mainloop()
